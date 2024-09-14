@@ -1,19 +1,35 @@
-import React from 'react'
-
-
-//Este componente debera ser estilado como "dark" o "light" dependiendo del theme del Context
+import axios from 'axios';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import DetailsCard from '../Components/DetailsCard';
 
 const Detail = () => {
- 
-  // Consumiendo el parametro dinamico de la URL deberan hacer un fetch a un user en especifico
+  const [dentist, setDentist] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { id } = useParams();
+  const url = `https://jsonplaceholder.typicode.com/users/${id}`;
+
+  const fetchDentist = useCallback(async () => {
+    try {
+      const res = await axios(url);
+      setDentist(res.data);
+    } catch (error) {
+      console.error('Error fetching dentist data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchDentist();
+  }, [fetchDentist]);
 
   return (
     <>
-      <h1>Detail Dentist id </h1>
-      {/* aqui deberan renderizar la informacion en detalle de un user en especifico */}
-      {/* Deberan mostrar el name - email - phone - website por cada user en especifico */}
+      <h1>Dentist Details</h1>
+      {loading ? <p>Loading...</p> : dentist ? <DetailsCard dentist={dentist} /> : <p>No dentist data available.</p>}
     </>
   )
 }
 
-export default Detail
+export default Detail;
